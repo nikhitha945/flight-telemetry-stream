@@ -52,7 +52,8 @@ docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh \
 --from-beginning \
 --property print.key=true \
 --property print.partition=true
-Design decisions
+
+# Design decisions
 Topic named by pipeline stage — telemetry.raw.
 The .raw suffix means exactly as produced, unmodified — the source of truth for the pipeline. Derived data (aggregates, alerts) will live on separate topics computed from raw, so any processing bug can be fixed and the results recomputed by replaying the untouched original.
 Events keyed by aircraft ID.
@@ -66,7 +67,8 @@ The producer waits for the broker to persist each record (acks=all) before loggi
 Verified on Day 1
 Producer logs ↔ console consumer output ↔ broker segment files (kafka-dump-log.sh on the partition's .log file) all show the same records.
 Key→partition mapping observed directly in storage: AC-101 and AC-102 hashed to partition 0; AC-103 and AC-105 to partition 1 — different keys share partitions, but no key ever appears in two.
-Roadmap
+
+# Roadmap
 Day 2 — Stream processing: per-aircraft windowed aggregates (1-minute tumbling windows: average speed, motor temperature).
 Day 3 — Anomaly detection (rapid battery drain, motor over-temperature) published to a telemetry.alerts topic; latest aircraft state in Redis; REST API serving latest state and aggregates.
 Stretch — Live map UI plotting aircraft positions in real time.
