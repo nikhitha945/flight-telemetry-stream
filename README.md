@@ -3,15 +3,12 @@ A real-time telemetry streaming pipeline built with Java 21, Spring Boot, and Ap
 Simulated aircraft continuously emit telemetry — position, altitude, speed, battery, motor temperature — which is published to Kafka, keyed and partitioned for ordered, parallel processing. This project is a hands-on study of event streaming fundamentals: partitioning, ordering guarantees, consumer groups, offsets, and durability.
 Built as a learning project to understand how real-time data platforms ingest and process high-frequency telemetry (the same shape of problem as live aircraft tracking: many producers, continuous events, consumers that cannot afford to fall behind).
 Architecture — Day 1
-┌─────────────────────────┐        telemetry.raw         ┌──────────────────┐
-│  Telemetry Producer     │  ─────────────────────────▶  │  Kafka (KRaft)   │
-│  Spring Boot simulator  │   key = aircraftId (String)  │  1 broker        │
-│  5 aircraft × 1 event/s │   value = event JSON         │  3 partitions    │
-└─────────────────────────┘                              └──────────────────┘
-│
-▼
-console consumer /
-stream processor (Day 2)
+flowchart LR
+P["Telemetry Producer<br/>Spring Boot simulator<br/>5 aircraft, 1 event/sec each"]
+K[("Kafka (KRaft mode)<br/>topic: telemetry.raw<br/>3 partitions")]
+C["Console consumer /<br/>stream processor (Day 2)"]
+P -->|"key: aircraftId, value: event JSON"| K
+K --> C
 Tech stack
 Java 21 · Spring Boot 4.1.1 · Spring Kafka
 Apache Kafka 4.2.1 in KRaft mode (no Zookeeper), run via Docker Compose
@@ -73,15 +70,4 @@ Roadmap
 Day 2 — Stream processing: per-aircraft windowed aggregates (1-minute tumbling windows: average speed, motor temperature).
 Day 3 — Anomaly detection (rapid battery drain, motor over-temperature) published to a telemetry.alerts topic; latest aircraft state in Redis; REST API serving latest state and aggregates.
 Stretch — Live map UI plotting aircraft positions in real time.
-Project structure
-flight-telemetry-stream/
-├── docker-compose.yml          # Kafka broker (KRaft, combined mode)
-├── pom.xml
-└── src/main/
-├── java/com/streaming/telemetry/
-│   ├── TelemetryApplication.java   # entry point (@EnableScheduling)
-│   ├── TelemetryProducer.java      # ticks the fleet, publishes every second
-│   ├── Aircraft.java               # simulated aircraft (mutable state + behavior)
-│   └── TelemetryEvent.java         # the message (immutable record)
-└── resources/
-└── application.yaml            # Kafka bootstrap + serializers
+tion.yaml            # Kafka bootstrap + serializers
