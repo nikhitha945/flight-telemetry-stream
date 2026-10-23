@@ -1,4 +1,4 @@
-Flight Telemetry Stream
+# Flight Telemetry Stream
 A real-time telemetry streaming pipeline built with Java 21, Spring Boot, and Apache Kafka.
 Simulated aircraft continuously emit telemetry — position, altitude, speed, battery, motor temperature — which is published to Kafka, keyed and partitioned for ordered, parallel processing. This project is a hands-on study of event streaming fundamentals: partitioning, ordering guarantees, consumer groups, offsets, and durability.
 Built as a learning project to understand how real-time data platforms ingest and process high-frequency telemetry (the same shape of problem as live aircraft tracking: many producers, continuous events, consumers that cannot afford to fall behind).
